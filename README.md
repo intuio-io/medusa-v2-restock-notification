@@ -41,6 +41,7 @@ module.exports = {
 ## Environment Variables
 
 Add to your `.env`:
+
 ```bash
 SENDGRID_API_KEY=your_api_key
 SENDGRID_FROM=notifications@yourstore.com
@@ -56,8 +57,8 @@ Since Medusa v2 requires API routes and jobs to be implemented at the applicatio
 
 #### Subscribe to Restock Notifications
 Create `src/api/store/restock-notifications/route.ts`:
-\`\`\`typescript
-// POST /store/restock-notifications
+
+```typescript
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { RestockService } from "@intuio/medusa-restock-notification"
 import { Modules } from "@medusajs/framework/utils"
@@ -153,7 +154,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     }
 }
 
-// GET /store/restock-notifications
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
     const restockService = req.scope.resolve<RestockService>("restock")
     const { email } = req.query
@@ -170,12 +170,12 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         res.status(400).json({ message: error.message })
     }
 }
-\`\`\`
+```
 
 #### Check Subscription Status
 Create `src/api/store/restock-notifications/check-subscription/route.ts`:
-\`\`\`typescript
-// GET /store/restock-notifications/check-subscription
+
+```typescript
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { RestockService } from "@intuio/medusa-restock-notification"
 
@@ -205,12 +205,12 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         res.status(400).json({ message: error.message })
     }
 }
-\`\`\`
+```
 
 #### Remove Subscription
 Create `src/api/store/restock-notifications/[id]/route.ts`:
-\`\`\`typescript
-// DELETE /store/restock-notifications/:id
+
+```typescript
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { RestockService } from "@intuio/medusa-restock-notification"
 
@@ -226,13 +226,13 @@ export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
         res.status(400).json({ message: error.message })
     }
 }
-\`\`\`
+```
 
 ### 2. Admin API Routes
 
 Create `src/api/admin/restock-notifications/route.ts`:
-\`\`\`typescript
-// GET /admin/restock-notifications
+
+```typescript
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { RestockService } from "@intuio/medusa-restock-notification"
 import { IProductModuleService, IInventoryService } from "@medusajs/types"
@@ -259,7 +259,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     }
 }
 
-// POST /admin/restock-notifications
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
     const restockService = req.scope.resolve<RestockService>("restock")
     const productService = req.scope.resolve<IProductModuleService>(Modules.PRODUCT)
@@ -296,9 +295,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
             return
         }
 
-
         // Get product details
-
         const product = await productService.retrieveProduct(variant.product_id)
 
         if (!product) {
@@ -315,7 +312,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
             res.status(404).json({ message: "No inventory item found" })
             return
         }
-
 
         // Get inventory levels for this item
         const levels = await inventoryService.listInventoryLevels({
@@ -388,14 +384,13 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         })
     }
 }
-
-// export const AUTHENTICATE = false;
-\`\`\`
+```
 
 ### 3. Inventory Check Job
 
 Create `src/jobs/check-inventory.ts`:
-\`\`\`typescript
+
+```typescript
 import { IProductModuleService, IInventoryService, MedusaContainer } from "@medusajs/framework/types"
 import { Modules } from "@medusajs/framework/utils"
 import { RestockService } from "@intuio/medusa-restock-notification"
@@ -519,7 +514,7 @@ export const config = {
     name: "check-inventory-restock",
     schedule: "*/5 * * * *", // Run every 5 minutes
 }
-\`\`\`
+```
 
 ## API Reference
 
@@ -565,29 +560,50 @@ export const config = {
 
 ### SendGrid Template Variables
 
-Available template variables:
-- `product_title`
-- `variant_title`
-- `current_stock`
-- `store_name`
+The following variables are available in your SendGrid email templates:
+- `product_title` - The name of the product
+- `variant_title` - The specific variant title
+- `current_stock` - Current available stock quantity
+- `store_name` - Your store name as configured in environment variables
 
 ### Job Schedule
 
-The inventory check job runs every 5 minutes by default. You can modify the schedule in the job configuration using standard cron syntax.
+The inventory check job runs every 5 minutes by default. You can modify the schedule in the job configuration using standard cron syntax. To change the schedule, modify the `config` object in the `check-inventory.ts` file:
+
+```typescript
+export const config = {
+    name: "check-inventory-restock",
+    schedule: "*/5 * * * *", // Modify this cron expression as needed
+}
+```
+
+Common cron schedule examples:
+- Every hour: `0 * * * *`
+- Every day at midnight: `0 0 * * *`
+- Every 15 minutes: `*/15 * * * *`
 
 ## Development
 
+To work on the module locally:
+
 ```bash
+# Install dependencies
+npm install
+
 # Build the module
 npm run build
 
 # Run migrations
 npx medusa db:migrate
 
-# Watch mode
+# Run in watch mode during development
 npm run dev
 ```
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue on the GitHub repository
