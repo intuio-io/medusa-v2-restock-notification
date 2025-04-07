@@ -1,9 +1,9 @@
 {
   "name": "@intuio/medusa-restock-notification",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Restock notification module for Medusa v2",
   "main": "dist/index.js",
-  "author": "Intuio",
+  "author": "Intuio Software Labs",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
